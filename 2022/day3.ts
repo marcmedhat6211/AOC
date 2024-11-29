@@ -35,14 +35,16 @@ const rucksackReorganization = (ruckstacks: string[]): number => {
     const secondHalf = formattedStr.secondHalf;
 
     for (let i = 0; i < firstHalf.length; i++) {
-      // let commonChar = secondtHalf.split('').find((char) => firstHalf[i] === char);
-      const commonChar = firstHalf.split('').find(char => secondHalf.includes(char));
+      let commonChar = secondHalf.split('').find((char) => firstHalf[i] === char);
 
       if (commonChar) {
         result += alphabetMap[commonChar];
+        break;
       }
     }
   }
 
   return result;
 }
+
+// right answer: 7845
