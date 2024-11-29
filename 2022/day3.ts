@@ -47,4 +47,36 @@ const rucksackReorganization = (ruckstacks: string[]): number => {
   return result;
 }
 
-// right answer: 7845
+const getSumOfPrioritiesOfItemTypes = (ruckstacks: string[]): number => {
+  const alphabetMap = generateAlphabetMap();
+  let sumOfPriorities = 0;
+
+  let startingLoopPoint = 0;
+  let endingLoopPoint = 2;
+  while (endingLoopPoint <= ruckstacks.length) {
+    for (let i = startingLoopPoint; i <= endingLoopPoint; i++) {
+      let firstStack = ruckstacks[i];
+      let secondStack = ruckstacks[i + 1];
+      let thirdStack = ruckstacks[i + 2];
+
+      for (let j = 0; j < firstStack.length; j++) {
+        let commonCharInSecond = secondStack.split('').find((char) => firstStack[j] === char);
+        let commonCharInThird = thirdStack.split('').find((char) => firstStack[j] === char);
+
+        if (commonCharInSecond && commonCharInThird) {
+          sumOfPriorities += alphabetMap[commonCharInSecond];
+          i = endingLoopPoint + 1;
+          break;
+        }
+      }
+    }
+
+    startingLoopPoint += 3;
+    endingLoopPoint += 3;
+  }
+
+  return sumOfPriorities;
+}
+
+// first part right answer: 7845
+// second part right answer: 2790
