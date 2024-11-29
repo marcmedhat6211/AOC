@@ -9,6 +9,14 @@ class Stack<T> {
     return this.items.pop();
   }
 
+  popByIndex(index: number): T | undefined {
+    if (index < 0 || index >= this.items.length) {
+      return undefined;
+    }
+    
+    return this.items.splice(index, 1)[0];
+  }
+
   peek(): T {
     return this.items[this.items.length - 1];
   }
@@ -552,6 +560,16 @@ const addStacksToStackClass = (stacksArray: string[][]): Record<number, Stack<st
   return stacks;
 }
 
+const getPeeksOfStacksConcatinatedString = (stacks: Record<number, Stack<string>>): string => {
+  let peeksOfStacks = '';
+
+  for (let stackNumber in stacks) {
+    peeksOfStacks += stacks[stackNumber].peek();
+  }
+
+  return peeksOfStacks;
+}
+
 const getPeeksOfStacks = (movements: {move: number, from: number, to: number}[]): string => {
   const stacks: Record<number, Stack<string>> = addStacksToStackClass(stacksRepresentation);
 
@@ -562,14 +580,24 @@ const getPeeksOfStacks = (movements: {move: number, from: number, to: number}[])
     }
   }
 
-  let peeksOfStacks = '';
-
-  for (let stackNumber in stacks) {
-    peeksOfStacks += stacks[stackNumber].peek();
-  }
-
-  return peeksOfStacks;
+  return getPeeksOfStacksConcatinatedString(stacks);
 }
 
-const res = getPeeksOfStacks(movements);
-console.log(res);
+const getPeeksOfStacksForCrateMover9001 = (movements: {move: number, from: number, to: number}[]): string => {
+  const stacks: Record<number, Stack<string>> = addStacksToStackClass(stacksRepresentation);
+
+  for (let movement of movements) {
+    for (let i = 0; i < movement.move; i++) {
+      if (movement.move === 1) {
+        const popedCrate = stacks[movement.from].pop();
+        stacks[movement.to].push(popedCrate as string);
+      } else {
+        let startingIndex = stacks[movement.from].size() - (movement.move - i);
+        const popedCrate = stacks[movement.from].popByIndex(startingIndex);
+        stacks[movement.to].push(popedCrate as string);
+      }
+    }
+  }
+
+  return getPeeksOfStacksConcatinatedString(stacks);
+}
