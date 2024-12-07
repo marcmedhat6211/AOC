@@ -1023,47 +1023,6 @@ const isReportSafe = (report: number[]): boolean => {
   return true;
 };
 
-const removeAndRetry = (
-  invalidIndices: Record<number, number>,
-  report: number[]
-) => {
-  for (let index in invalidIndices) {
-    report.splice(+index, 1);
-
-    if (isReportSafe(report)) {
-      return true;
-    }
-
-    report.splice(+index, 0, invalidIndices[index]);
-  }
-
-  return false;
-};
-
-const isReportSafeProblemDampenerVersion = (report: number[]): boolean => {
-  let initialState: ReportState =
-    report[1] - report[0] > 0 ? "increasing" : "decreasing";
-
-  for (let i = 1; i < report.length; i++) {
-    const diff = Math.abs(report[i] - report[i - 1]);
-    if (diff === 0 || diff > 3) {
-      if (!removeAndRetry({ [i]: report[i], [i - 1]: report[i - 1] }, report)) {
-        return false;
-      }
-    }
-
-    let currentState: ReportState =
-      report[i] - report[i - 1] > 0 ? "increasing" : "decreasing";
-    if (currentState !== initialState) {
-      if (!removeAndRetry({ [i]: report[i], [i - 1]: report[i - 1] }, report)) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-};
-
 const getNumberOfSafeReports = (reports: number[][]): number => {
   let numberOfSafeReports = 0;
 
@@ -1076,21 +1035,31 @@ const getNumberOfSafeReports = (reports: number[][]): number => {
   return numberOfSafeReports;
 };
 
-const getNumberOfSafeReportsProblemDampenerVersion = (
-  reports: number[][]
-): number => {
-  let numberOfSafeReports = 0;
+const countSafeReportsWithDampener = (reports: number[][]): number => {
+  let safeCount = 0;
 
-  for (let report of reports) {
-    if (isReportSafeProblemDampenerVersion(report)) {
-      numberOfSafeReports++;
+  for (const levels of reports) {
+    if (isReportSafe(levels)) {
+      safeCount++;
+      continue;
+    }
+
+    let isSafeWithDampener = false;
+    for (let i = 0; i < levels.length; i++) {
+      const newLevels = levels.slice(0, i).concat(levels.slice(i + 1));
+      if (isReportSafe(newLevels)) {
+        isSafeWithDampener = true;
+        break;
+      }
+    }
+
+    if (isSafeWithDampener) {
+      safeCount++;
     }
   }
 
-  return numberOfSafeReports;
+  return safeCount;
 };
 
-const res = getNumberOfSafeReportsProblemDampenerVersion(input);
-console.log(res);
-
 // right answer for part 1: 287
+// right answer for part 2: 354
